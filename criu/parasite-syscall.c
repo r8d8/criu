@@ -445,7 +445,7 @@ static int restore_child_handler()
 }
 
 static int prepare_tsock(struct parasite_ctl *ctl, pid_t pid,
-		struct parasite_init_args *args, struct ns_id *net)
+		struct parasite_init_args *args)
 {
 	static int ssock = -1;
 
@@ -453,8 +453,13 @@ static int prepare_tsock(struct parasite_ctl *ctl, pid_t pid,
 	args->h_addr_len = gen_parasite_saddr(&args->h_addr, getpid());
 
 	if (ssock == -1) {
-		ssock = net->net.seqsk;
-		net->net.seqsk = -1;
+		ssock = *ctl->ictx.p_sock;
+		if (ssock == -1) {
+			pr_err("No socket in ictx\n");
+			goto err;
+		}
+
+		*ctl->ictx.p_sock = -1;
 
 		if (bind(ssock, (struct sockaddr *)&args->h_addr, args->h_addr_len) < 0) {
 			pr_perror("Can't bind socket");
@@ -498,7 +503,7 @@ static int accept_tsock(struct parasite_ctl *ctl)
 	return 0;
 }
 
-static int parasite_init_daemon(struct parasite_ctl *ctl, struct ns_id *net)
+static int parasite_init_daemon(struct parasite_ctl *ctl)
 {
 	struct parasite_init_args *args;
 	pid_t pid = ctl->rpid;
@@ -514,7 +519,7 @@ static int parasite_init_daemon(struct parasite_ctl *ctl, struct ns_id *net)
 
 	futex_set(&args->daemon_connected, 0);
 
-	if (prepare_tsock(ctl, pid, args, net))
+	if (prepare_tsock(ctl, pid, args))
 		goto err;
 
 	/* after this we can catch parasite errors in chld handler */
@@ -1437,7 +1442,7 @@ static int parasite_start_daemon(struct parasite_ctl *ctl, struct pstree_item *i
 	if (construct_sigframe(ctl->sigframe, ctl->rsigframe, &ctl->orig.sigmask, item->core[0]))
 		return -1;
 
-	if (parasite_init_daemon(ctl, dmpi(item)->netns))
+	if (parasite_init_daemon(ctl))
 		return -1;
 
 	return 0;
@@ -1476,6 +1481,8 @@ struct parasite_ctl *parasite_infect_seized(pid_t pid, struct pstree_item *item,
 	ctl = parasite_prep_ctl(pid, p);
 	if (!ctl)
 		return NULL;
+
+	ctl->ictx.p_sock = &dmpi(item)->netns->net.seqsk;
 
 	parasite_ensure_args_size(dump_pages_args_size(vma_area_list));
 	parasite_ensure_args_size(aio_rings_args_size(vma_area_list));
