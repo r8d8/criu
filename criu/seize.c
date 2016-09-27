@@ -13,7 +13,7 @@
 #include "cr_options.h"
 #include "cr-errno.h"
 #include "pstree.h"
-#include "ptrace.h"
+#include "proc_parse.h"
 #include "seize.h"
 #include "stats.h"
 #include "xmalloc.h"
@@ -658,11 +658,11 @@ static bool creds_dumpable(struct proc_status_creds *parent,
 				 parent->gids[1], child->gids[1],
 				 parent->gids[2], child->gids[2],
 				 parent->gids[3], child->gids[3],
-				 parent->state, child->state,
-				 parent->ppid, child->ppid,
-				 parent->sigpnd, child->sigpnd,
-				 parent->shdpnd, child->shdpnd,
-				 parent->seccomp_mode, child->seccomp_mode,
+				 parent->s.state, child->s.state,
+				 parent->s.ppid, child->s.ppid,
+				 parent->s.sigpnd, child->s.sigpnd,
+				 parent->s.shdpnd, child->s.shdpnd,
+				 parent->s.seccomp_mode, child->s.seccomp_mode,
 				 parent->last_filter, child->last_filter);
 		}
 		return false;

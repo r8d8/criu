@@ -992,8 +992,8 @@ int parse_pid_status(pid_t pid, struct proc_status_creds *cr)
 		return -1;
 	}
 
-	cr->sigpnd = 0;
-	cr->shdpnd = 0;
+	cr->s.sigpnd = 0;
+	cr->s.shdpnd = 0;
 
 	if (bfdopenr(&f))
 		return -1;
@@ -1006,13 +1006,13 @@ int parse_pid_status(pid_t pid, struct proc_status_creds *cr)
 			goto err_parse;
 
 		if (!strncmp(str, "State:", 6)) {
-			cr->state = str[7];
+			cr->s.state = str[7];
 			done++;
 			continue;
 		}
 
 		if (!strncmp(str, "PPid:", 5)) {
-			if (sscanf(str, "PPid:\t%d", &cr->ppid) != 1) {
+			if (sscanf(str, "PPid:\t%d", &cr->s.ppid) != 1) {
 				pr_err("Unable to parse: %s\n", str);
 				goto err_parse;
 			}
@@ -1069,7 +1069,7 @@ int parse_pid_status(pid_t pid, struct proc_status_creds *cr)
 		}
 
 		if (!strncmp(str, "Seccomp:", 8)) {
-			if (sscanf(str + 9, "%d", &cr->seccomp_mode) != 1) {
+			if (sscanf(str + 9, "%d", &cr->s.seccomp_mode) != 1) {
 				goto err_parse;
 			}
 
@@ -1083,7 +1083,7 @@ int parse_pid_status(pid_t pid, struct proc_status_creds *cr)
 
 			if (sscanf(str + 7, "%llx", &sigpnd) != 1)
 				goto err_parse;
-			cr->shdpnd |= sigpnd;
+			cr->s.shdpnd |= sigpnd;
 
 			done++;
 			continue;
@@ -1093,7 +1093,7 @@ int parse_pid_status(pid_t pid, struct proc_status_creds *cr)
 
 			if (sscanf(str + 7, "%llx", &sigpnd) != 1)
 				goto err_parse;
-			cr->sigpnd |= sigpnd;
+			cr->s.sigpnd |= sigpnd;
 
 			done++;
 			continue;
