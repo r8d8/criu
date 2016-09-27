@@ -13,6 +13,7 @@
 #include "cr_options.h"
 #include "cr-errno.h"
 #include "pstree.h"
+#include "ptrace.h"
 #include "proc_parse.h"
 #include "seize.h"
 #include "stats.h"
@@ -487,7 +488,7 @@ static int collect_children(struct pstree_item *item)
 			goto free;
 		}
 
-		ret = seize_wait_task(pid, item->pid.real, parse_pid_status, &creds->s);
+		ret = compel_wait_task(pid, item->pid.real, parse_pid_status, &creds->s);
 		if (ret < 0) {
 			/*
 			 * Here is a race window between parse_children() and seize(),
@@ -712,7 +713,7 @@ static int collect_threads(struct pstree_item *item)
 		if (!opts.freeze_cgroup && compel_stop_task(pid))
 			continue;
 
-		ret = seize_wait_task(pid, item_ppid(item), parse_pid_status, &t_creds.s);
+		ret = compel_wait_task(pid, item_ppid(item), parse_pid_status, &t_creds.s);
 		if (ret < 0) {
 			/*
 			 * Here is a race window between parse_threads() and seize(),
@@ -850,7 +851,7 @@ int collect_pstree(void)
 	if (!creds)
 		goto err;
 
-	ret = seize_wait_task(pid, -1, parse_pid_status, &creds->s);
+	ret = compel_wait_task(pid, -1, parse_pid_status, &creds->s);
 	if (ret < 0)
 		goto err;
 
