@@ -19,7 +19,7 @@
 #include "restorer.h"
 #include "errno.h"
 #include "kerndat.h"
-
+#include "infect-priv.h"
 
 /*
  * Injected syscall instruction

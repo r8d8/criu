@@ -18,7 +18,7 @@
 #include "cpu.h"
 #include "parasite-syscall.h"
 #include "restorer.h"
-
+#include "infect-priv.h"
 
 /*
  * Injected syscall instruction
