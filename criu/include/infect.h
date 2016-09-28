@@ -47,4 +47,7 @@ extern int compel_cure(struct parasite_ctl *ctl);
 
 extern void *compel_parasite_args_p(struct parasite_ctl *ctl);
 extern void *compel_parasite_args_s(struct parasite_ctl *ctl, int args_size);
+
+extern int compel_execute_syscall(struct parasite_ctl *ctl,
+		user_regs_struct_t *regs, const char *code_syscall);
 #endif
