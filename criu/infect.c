@@ -18,10 +18,8 @@
 #include "sigframe.h"
 #include "log.h"
 #include "infect.h"
+#include "infect-rpc.h"
 #include "infect-priv.h"
-
-/* XXX will be removed soon */
-extern int parasite_wait_ack(int sockfd, unsigned int cmd, struct ctl_msg *m);
 
 #define PTRACE_EVENT_STOP	128
 
@@ -896,7 +894,7 @@ static int parasite_fini_seized(struct parasite_ctl *ctl)
 		return -1;
 	}
 
-	ret = __parasite_execute_daemon(PARASITE_CMD_FINI, ctl);
+	ret = compel_rpc_call(PARASITE_CMD_FINI, ctl);
 	close_safe(&ctl->tsock);
 	if (ret)
 		return -1;

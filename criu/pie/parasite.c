@@ -17,6 +17,7 @@
 #include "log.h"
 #include "tty.h"
 #include "aio.h"
+#include "infect-rpc.h"
 
 #include "asm/types.h"
 #include "asm/parasite.h"
