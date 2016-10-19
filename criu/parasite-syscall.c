@@ -16,7 +16,6 @@
 #include "ptrace.h"
 #include "asm/processor-flags.h"
 #include "parasite-syscall.h"
-#include "parasite-blob.h"
 #include "parasite.h"
 #include "crtools.h"
 #include "namespaces.h"
